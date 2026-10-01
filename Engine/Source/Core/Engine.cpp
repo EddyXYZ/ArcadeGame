@@ -1,0 +1,68 @@
+#include "Core/Engine.h"
+#include "Core/EngineConfig.h"
+#include "Utils/Log.h"
+
+Engine::Engine() :
+    window_(sf::VideoMode(sf::Vector2u(gConfig.windowSize)), gConfig.windowTitle)
+{
+    window_.setIcon(sf::Image("Content/Textures/Icon.png"));
+    window_.setMinimumSize(window_.getSize() / 2u);
+
+    if (gConfig.disableSfmlLogs)
+    {
+        sf::err().rdbuf(nullptr); // Redirect SFML's internal error stream to nowhere
+    }
+
+    LOG_INFO("Window created");
+    LOG_INFO("Random int: {}", context_.random.Int(1, 20));
+    LOG_INFO("Random float: {}", context_.random.Float(0.f, 50.f));
+    LOG_INFO("Random bool: {}", context_.random.Bool());
+}
+
+bool Engine::IsRunning() const
+{
+    return window_.isOpen();
+}
+
+void Engine::ProcessEvents()
+{
+    while (const std::optional<sf::Event> event = window_.pollEvent())
+    {
+        event->visit(EngineVisitor(*this));
+    }
+}
+
+void Engine::Update()
+{
+
+}
+
+void Engine::Render()
+{
+    window_.clear();
+
+
+
+    window_.display();
+}
+
+void Engine::EventWindowClose()
+{
+    window_.close();
+    LOG_INFO("Window closed");
+}
+
+void Engine::EventWindowResized(sf::Vector2u size)
+{
+    LOG_INFO("Window resized to: {}x{}", size.x, size.y);
+}
+
+void Engine::EventWindowFocusLost()
+{
+    LOG_INFO("Window lost focus");
+}
+
+void Engine::EventWindowFocusGained()
+{
+    LOG_INFO("Window gained focus");
+}
